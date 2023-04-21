@@ -1,6 +1,6 @@
 
-AWS Access Key ID [****************rkar]: AKIASVGMAAL4ZNTQCUS3
-AWS Secret Access Key [****************@123]: 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
+AWS Access Key ID [***************: 
+AWS Secret Access Key [****************:
 
 
 #create Bucket withs tags  CLI
@@ -27,7 +27,7 @@ Make sure versioning is enabled on the bucket.
 
 Update the contents of the file by uploading a new version of "example.txt" to the bucket.
 
-To access the older version of the file, you can use the AWS Management Console, AWS CLI or any AWS SDKs to list the versions of the file and retrieve the version ID of the version you want to access.
+To the older version of the file, you can use the AWS Management Console, AWS CLI or any AWS SDKs to list the versions of the file and retrieve the version ID of the version you want to access.
 
 Once you have the version ID of the older version you want to retrieve, you can download it using the following command
 # aws s3api put-bucket-versioning --bucket my-bucket --versioning-configuration Status=Enabled
