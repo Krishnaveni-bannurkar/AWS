@@ -1,0 +1,214 @@
+
+AWS Access Key ID [****************rkar]: AKIASVGMAAL4ZNTQCUS3
+AWS Secret Access Key [****************@123]: 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
+
+
+#create Bucket withs tags  CLI
+
+aws s3 mb s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-no-encrption --region us-west-2
+
+#add Tags
+aws s3api put-bucket-tagging --bucket cw-us-west-2-101927567363-training-2021-kv-cli-aes-no-encrption --tagging 'TagSet=[{Key=username,Value=Krishnaveni},{Key=batch,Value=training-2021},{Key=name,Value=cw-us-west-2-101927567363-training-2021-kv-cli-aes-no-encrption},{Key=environment,Value=develop},{Key=region,Value=us-west-2}]'
+
+
+#copy File from local to s3 bucket
+aws s3 cp No_Encrypt_Image.png s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-no-encrption/
+aws s3 cp NO_Encrypt.txt s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-no-encrption/
+
+
+#copy files from one bucket to other: no_enc to  enc
+aws s3 cp s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-no-encrption/No_Encrypt_Image.png s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-encrption/copied_data_from_No_Encrypt_Image.png
+aws s3 cp s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-no-encrption/NO_Encrypt.txt  s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-encrption/copied_data_from_NO_Encrypt.txt 
+
+#Versioning
+Upload a file to the S3 bucket, let's call it "example.txt".
+
+Make sure versioning is enabled on the bucket.
+
+Update the contents of the file by uploading a new version of "example.txt" to the bucket.
+
+To access the older version of the file, you can use the AWS Management Console, AWS CLI or any AWS SDKs to list the versions of the file and retrieve the version ID of the version you want to access.
+
+Once you have the version ID of the older version you want to retrieve, you can download it using the following command
+# aws s3api put-bucket-versioning --bucket my-bucket --versioning-configuration Status=Enabled
+# aws s3api get-bucket-versioning --bucket my-bucket
+
+#   aws s3api list-object-versions --bucket my-bucket --prefix version_sample.txt
+#   aws s3api get-object --bucket cw-us-west-2-101927567363-training-2021-kv-cli-aes-no-encrption --key version_sample.txt --version-id null version_sample.txt
+# aws s3api get-object --bucket my-bucket --key example.txt --version-id <version-id> example.txt
+
+####################################################################
+
+
+#create Bucket withs tags and enc  CLI
+
+aws s3 mb s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-encrption --region us-west-2  
+
+#add Tags
+aws s3api put-bucket-tagging --bucket cw-us-west-2-101927567363-training-2021-kv-cli-aes-no-encrption --tagging 'TagSet=[{Key=username,Value=Krishnaveni},{Key=batch,Value=training-2021},{Key=name,Value=cw-us-west-2-101927567363-training-2021-kv-cli-aes-encrption},{Key=environment,Value=develop},{Key=region,Value=us-west-2}]'
+
+
+#Add encryption
+aws s3api put-bucket-encryption \
+    --bucket cw-us-west-2-101927567363-training-2021-kv-cli-aes-encrption \
+    --server-side-encryption-configuration '{"Rules": [{"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}'
+
+#copy File from local to s3 bucket
+aws s3 cp Encrypt_image.png s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-encrption/
+aws s3 cp Encrypt.txt s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-encrption/
+
+
+#copy files from one bucket to other: enc to no enc
+aws s3 cp s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-encrption/Encrypt_image.png s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-no-encrption/copied_data_from_Encrypt_image.png
+aws s3 cp s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-encrption/Encrypt.txt s3://cw-us-west-2-101927567363-training-2021-kv-cli-aes-no-encrption/copied_data_from_Encrypt.txt
+
+
+####################################################################
+
+#create Bucket withs tags  BOTO3
+
+
+"""session = boto3.Session(
+aws_access_key_id=''
+aws_secret_access_key=''
+)
+s3 = session.resource('s3')
+"""
+
+import boto3
+sess = boto3.Session(region_name='us-west-2')
+s3_client = sess.client('s3')
+bucket_name = 'cw-us-west-2-101927567363-training-2021-kv-sdk-aes-no-enc'
+s3_location = {
+    'LocationConstraint': 'us-west-2'
+}
+s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=s3_location)
+
+#add Tags
+s3_tag = boto3.resource('s3')
+bucket_tagging = s3_tag.BucketTagging('cw-us-west-2-101927567363-training-2021-kv-sdk-aes-no-enc')
+response = bucket_tagging.put(
+    Tagging={
+        'TagSet': [
+            {
+                'Key': 'username',
+                'Value': 'Krishnaveni'
+            },
+            {
+                'Key': 'batch',
+                'Value': 'training-2021'
+            },
+            {
+                'Key': 'name',
+                'Value': 'cw-us-west-2-101927567363-training-2021-kv-sdk-aes-no-enc'
+            },
+            {
+                'Key': 'environment',
+                'Value': 'develop'
+            },
+            {
+                'Key': 'region',
+                'Value': 'us-west-2'
+            },
+        ]
+    },
+
+)
+
+#copy File from local to s3 bucket 
+import boto3
+s3 = boto3.resource('s3')
+s3.meta.client.upload_file('/Users/krishnaveni/Desktop/Krishnaveni/Work/Learning/aws_work/NO_Encrypt.txt', 'cw-us-west-2-101927567363-training-2021-kv-sdk-aes-no-enc', 'NO_Encrypt.txt')
+
+
+
+#Copy files from one bucket to other: no_enc to enc
+import boto3
+s3 = boto3.resource('s3')
+copy_source = {
+    'Bucket': 'cw-us-west-2-101927567363-training-2021-kv-sdk-aes-no-enc',
+    'Key': 'NO_Encrypt.txt'
+}
+bucket = s3.Bucket('cw-us-west-2-101927567363-training-2021-kv-sdk-aes-encInfo')
+bucket.copy(copy_source, 'copied_data_from_NO_Encrypt.txt')
+
+####################################################################
+#create Bucket withs tags and enc  BOTO3
+
+"""session = boto3.Session(
+aws_access_key_id=''
+aws_secret_access_key=''
+)
+s3 = session.resource('s3')
+"""
+import boto3
+sess = boto3.Session(region_name='us-west-2')
+s3_client = sess.client('s3')
+bucket_name = 'cw-us-west-2-101927567363-training-2021-kv-sdk-aes-enc'
+s3_location = {
+    'LocationConstraint': 'us-west-2'
+}
+s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=s3_location)
+
+#add Tags
+s3_tag = boto3.resource('s3')
+bucket_tagging = s3_tag.BucketTagging('cw-us-west-2-101927567363-training-2021-kv-sdk-aes-enc')
+response = bucket_tagging.put(
+    Tagging={
+        'TagSet': [
+            {
+                'Key': 'username',
+                'Value': 'Krishnaveni'
+            },
+            {
+                'Key': 'batch',
+                'Value': 'training-2021'
+            },
+            {
+                'Key': 'name',
+                'Value': 'cw-us-west-2-101927567363-training-2021-kv-sdk-aes-no-enc'
+            },
+            {
+                'Key': 'environment',
+                'Value': 'develop'
+            },
+            {
+                'Key': 'region',
+                'Value': 'us-west-2'
+            },
+        ]
+    },
+
+)
+
+#Add encryption
+response2 = s3_client.put_bucket_encryption(
+    Bucket='cw-us-west-2-101927567363-training-2021-kv-sdk-aes-enc',
+    ServerSideEncryptionConfiguration={
+        'Rules': [
+            {
+                'ApplyServerSideEncryptionByDefault': {
+                    'SSEAlgorithm': 'AES256',
+                },
+                'BucketKeyEnabled': True
+            },
+        ]
+    },
+)
+
+#copy File from local to s3 bucket
+import boto3
+s3_copy_file = boto3.resource('s3')
+s3_copy_file.meta.client.upload_file('/Users/krishnaveni/Desktop/Krishnaveni/Work/Learning/aws_work/Encrypt.txt', 'cw-us-west-2-101927567363-training-2021-kv-sdk-aes-enc', 'Encrypt.txt')
+
+
+
+#copy files from one bucket to other: enc to no enc
+import boto3
+s3 = boto3.resource('s3')
+copy_source = {
+    'Bucket': 'cw-us-west-2-101927567363-training-2021-kv-sdk-aes-enc',
+    'Key': 'Encrypt.txt'
+}
+bucket = s3.Bucket('cw-us-west-2-101927567363-training-2021-kv-sdk-aes-no-enc')
+bucket.copy(copy_source, 'copied_data_from_Encrypt.txt')
